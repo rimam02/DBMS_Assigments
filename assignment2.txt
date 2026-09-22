@@ -1,0 +1,143 @@
+Last login: Mon Sep 14 22:40:38 on ttys038
+rimamaji@Rimas-MacBook-Air ~ % psql postgres
+psql (18.4 (Homebrew))
+Type "help" for help.
+
+postgres=# create bakery_db;
+ERROR:  syntax error at or near "bakery_db"
+LINE 1: create bakery_db;
+               ^
+postgres=# create bakery_db
+postgres-# ;
+ERROR:  syntax error at or near "bakery_db"
+LINE 1: create bakery_db
+               ^
+postgres=# create database bakery_db
+;
+CREATE DATABASE
+postgres=# CREATE TABLE store (
+    store_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    store_name VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    telephone VARCHAR(20),
+    website VARCHAR(150)
+);
+CREATE TABLE
+postgres=# INSERT INTO receipt
+(
+    bill_no,
+    store_id,
+    bill_date,
+    bill_time,
+    payment_method,
+    total_items,
+    total_quantity,
+    total_amount
+)
+VALUES
+(
+    1,
+    1,
+    '2025-09-07',
+    '17:38:00',
+    'Card',
+    4,
+    8,
+    960.00
+);
+ERROR:  relation "receipt" does not exist
+LINE 1: INSERT INTO receipt
+                    ^
+postgres=# CREATE TABLE receipt (
+    receipt_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    bill_no INTEGER NOT NULL,
+    store_id INTEGER NOT NULL,
+    bill_date DATE NOT NULL,
+    bill_time TIME NOT NULL,
+    payment_method VARCHAR(30),
+    total_items INTEGER,
+    total_quantity INTEGER,
+    total_amount NUMERIC(10,2),
+
+    FOREIGN KEY (store_id)
+        REFERENCES store(store_id),
+
+    UNIQUE (store_id, bill_no)
+);
+CREATE TABLE
+postgres=# CREATE TABLE receipt_item (
+    receipt_item_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    receipt_id INTEGER NOT NULL,
+    item_name VARCHAR(100) NOT NULL,
+    quantity INTEGER NOT NULL,
+    price NUMERIC(10,2) NOT NULL,
+
+    FOREIGN KEY (receipt_id)
+        REFERENCES receipt(receipt_id),
+
+    UNIQUE (receipt_id, item_name)
+);
+CREATE TABLE
+postgres=# INSERT INTO store
+(store_name, address, telephone, website)
+VALUES
+(
+    'My Bakery',
+    'Model Colony, Senapati Bapat Road, Shivaji nagar, Pune',
+    '020 66456678',
+    'www.mywebsite.com'
+);
+INSERT 0 1
+postgres=# INSERT INTO receipt
+(
+    bill_no,
+    store_id,
+    bill_date,
+    bill_time,
+    payment_method,
+    total_items,
+    total_quantity,
+    total_amount
+)
+VALUES
+(
+    1,
+    1,
+    '2025-09-07',
+    '17:38:00',
+    'Card',
+    4,
+    8,
+    960.00
+);
+INSERT 0 1
+postgres=# INSERT INTO receipt_item
+(receipt_id, item_name, quantity, price)
+VALUES
+(1, 'Bread', 1, 40.00),
+(1, 'Cakes', 2, 240.00),
+(1, 'Cheesecake', 1, 280.00),
+(1, 'Muffins', 4, 400.00);
+INSERT 0 4
+postgres=# SELECT * FROM store;
+ store_id | store_name |                        address                         |  telephone   |      website      
+----------+------------+--------------------------------------------------------+--------------+-------------------
+        1 | My Bakery  | Model Colony, Senapati Bapat Road, Shivaji nagar, Pune | 020 66456678 | www.mywebsite.com
+(1 row)
+
+postgres=# SELECT * FROM receipt;
+ receipt_id | bill_no | store_id | bill_date  | bill_time | payment_method | total_items | total_quantity | total_amount 
+------------+---------+----------+------------+-----------+----------------+-------------+----------------+--------------
+          1 |       1 |        1 | 2025-09-07 | 17:38:00  | Card           |           4 |              8 |       960.00
+(1 row)
+
+postgres=# SELECT * FROM receipt_item;
+ receipt_item_id | receipt_id | item_name  | quantity | price  
+-----------------+------------+------------+----------+--------
+               1 |          1 | Bread      |        1 |  40.00
+               2 |          1 | Cakes      |        2 | 240.00
+               3 |          1 | Cheesecake |        1 | 280.00
+               4 |          1 | Muffins    |        4 | 400.00
+(4 rows)
+
+postgres=# 
